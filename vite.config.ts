@@ -90,26 +90,6 @@ export default defineConfig({
     }),
   ],
   build: {
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: [
-            'react', 
-            'react-dom', 
-            '@remix-run/react',
-            'framer-motion'
-          ],
-          markdown: [
-            'mdx-bundler',
-            'rehype-autolink-headings',
-            'rehype-highlight',
-            'rehype-slug',
-            'rehype-toc',
-            'remark-gfm'
-          ],
-        },
-      },
-    },
     sourcemap: false,
     minify: 'terser',
     terserOptions: {
