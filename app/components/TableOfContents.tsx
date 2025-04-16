@@ -29,8 +29,11 @@ export function TableOfContents({ contentRef, className = "" }: TableOfContentsP
 
     headings.forEach((heading) => {
       const id = heading.id;
-      const title = heading.textContent || "";
-      const level = parseInt(heading.tagName.substring(1));
+      // '#' 기호 제거 및 앞뒤 공백 제거
+      let title = heading.textContent || "";
+      title = title.trim();
+      
+      const level = parseInt(heading.tagName.substring(1)); // h1=1, h2=2, ...
 
       items.push({ id, title, level });
     });
@@ -97,42 +100,82 @@ export function TableOfContents({ contentRef, className = "" }: TableOfContentsP
     return null;
   }
 
-  const getIndent = (level: number) => {
-    // 기본 h1 = 0, h2 = 1, h3 = 2 등의 인덴트 레벨 계산
+  // 목차 레벨에 따른 스타일 결정
+  const getLevelStyle = (level: number) => {
+    // 가장 낮은 레벨(가장 큰 제목)을 기준으로 설정
     const baseLevel = Math.min(...tocItems.map(item => item.level));
-    return `ml-${(level - baseLevel) * 4}`;
+    const relativeLevel = level - baseLevel;
+    
+    // 들여쓰기 클래스 결정 (미리 정의된 클래스 사용)
+    let indentClass = 'ml-0';
+    if (relativeLevel === 1) indentClass = 'ml-4';
+    else if (relativeLevel === 2) indentClass = 'ml-8';
+    else if (relativeLevel === 3) indentClass = 'ml-12';
+    else if (relativeLevel >= 4) indentClass = 'ml-16';
+    
+    // 폰트 크기와 굵기 계산
+    let fontSize = '';
+    let fontWeight = '';
+    
+    switch (relativeLevel) {
+      case 0: // 최상위 레벨 (h1 또는 가장 큰 제목)
+        fontSize = 'text-sm';
+        fontWeight = 'font-semibold';
+        break;
+      case 1: // 두 번째 레벨 (h2 또는 차상위 제목)
+        fontSize = 'text-sm';
+        fontWeight = 'font-medium';
+        break;
+      default: // 더 깊은 레벨
+        fontSize = 'text-xs';
+        fontWeight = 'font-normal';
+        break;
+    }
+    
+    return `${indentClass} ${fontSize} ${fontWeight}`;
+  };
+
+  // '#' 기호 제거 함수
+  const formatTitle = (title: string) => {
+    // '#' 기호로 시작하는 제목에서 '#' 및 그 뒤의 공백 제거
+    return title.replace(/^#\s*/, '');
   };
 
   return (
     <div className={`toc sticky top-24 ${className}`}>
       <h2 className="text-lg font-semibold mb-4 text-gray-800 dark:text-white">목차</h2>
       <nav>
-        <ul className="space-y-2 text-sm">
-          {tocItems.map((item) => (
-            <li key={item.id} className={getIndent(item.level)}>
-              <Link
-                to={`#${item.id}`}
-                className={`block hover:text-primary-600 dark:hover:text-primary-400 transition-colors py-1 border-l-2 pl-3 ${
-                  activeId === item.id
-                    ? "border-primary-600 dark:border-primary-400 text-primary-600 dark:text-primary-400 font-medium"
-                    : "border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400"
-                }`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  const element = document.getElementById(item.id);
-                  if (element) {
-                    setActiveId(item.id);
-                    window.scrollTo({
-                      top: element.offsetTop - 100,
-                      behavior: "smooth"
-                    });
-                  }
-                }}
-              >
-                {item.title}
-              </Link>
-            </li>
-          ))}
+        <ul className="space-y-1.5">
+          {tocItems.map((item) => {
+            const styleClass = getLevelStyle(item.level);
+            const formattedTitle = formatTitle(item.title);
+            
+            return (
+              <li key={item.id} className={styleClass}>
+                <Link
+                  to={`#${item.id}`}
+                  className={`block hover:text-primary-600 dark:hover:text-primary-400 transition-colors py-1 border-l-2 pl-3 ${
+                    activeId === item.id
+                      ? "border-primary-600 dark:border-primary-400 text-primary-600 dark:text-primary-400"
+                      : "border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300"
+                  }`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    const element = document.getElementById(item.id);
+                    if (element) {
+                      setActiveId(item.id);
+                      window.scrollTo({
+                        top: element.offsetTop - 100,
+                        behavior: "smooth"
+                      });
+                    }
+                  }}
+                >
+                  {formattedTitle}
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       </nav>
     </div>
