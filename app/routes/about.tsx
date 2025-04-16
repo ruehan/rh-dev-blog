@@ -19,7 +19,7 @@ export default function About() {
         </div>
         
         <div className="p-8">
-          <div className="prose prose-lg dark:prose-dark max-w-none">
+          <div className="prose prose-md dark:prose-dark max-w-none">
             <p>
               이 블로그는 Remix와 TypeScript를 사용하여 개발한 개인 기술 블로그입니다.
               최신 웹 개발 트렌드와 프로그래밍 지식을 공유하고 있습니다.

@@ -29,7 +29,7 @@ export function SearchBox({
       ref={formRef}
       method="get"
       action="/search"
-      className={`relative ${className}`}
+      className={`relative z-40 ${className}`}
       onSubmit={handleSearch}
     >
       <div className="relative">
@@ -55,7 +55,7 @@ export function SearchBox({
           name="q"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="w-full p-2.5 pl-10 text-sm text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 focus:ring-primary-500 focus:border-primary-500"
+          className="w-full p-2.5 pl-10 text-sm text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 focus:ring-primary-500 focus:border-primary-500 shadow-md"
           placeholder={placeholder}
           required
         />

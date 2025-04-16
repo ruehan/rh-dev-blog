@@ -127,6 +127,8 @@ export default {
       }),
       fontFamily: {
         sans: [
+          "Pretendard",
+          "Noto Sans KR",
           "Inter",
           "ui-sans-serif",
           "system-ui",

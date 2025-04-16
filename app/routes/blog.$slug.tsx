@@ -101,7 +101,7 @@ export default function BlogPost() {
               <TableOfContents contentRef={contentRef} />
             </div>
             
-            <div className="prose prose-lg lg:prose-xl dark:prose-dark max-w-none" ref={contentRef}>
+            <div className="prose prose-md dark:prose-dark max-w-none" ref={contentRef}>
               <Component />
             </div>
             

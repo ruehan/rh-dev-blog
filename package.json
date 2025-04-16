@@ -11,9 +11,11 @@
     "typecheck": "tsc"
   },
   "dependencies": {
+    "@remix-run/css-bundle": "^2.16.5",
     "@remix-run/node": "^2.16.5",
     "@remix-run/react": "^2.16.5",
     "@remix-run/serve": "^2.16.5",
+    "framer-motion": "^12.7.3",
     "isbot": "^4.1.0",
     "mdx-bundler": "^10.1.1",
     "react": "^18.2.0",

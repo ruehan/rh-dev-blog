@@ -4,6 +4,8 @@ import { Link, useLoaderData, useSearchParams } from "@remix-run/react";
 import { TagFilter } from "~/components/TagFilter";
 import { PostCard } from "~/components/PostCard";
 import { getAllCategories, getAllTags, getPostsByCategory } from "~/lib/mdx.server";
+import { FadeIn } from "~/components/animations/FadeIn";
+import { motion } from "framer-motion";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   if (!data) {
@@ -76,28 +78,37 @@ export default function CategoryPage() {
   
   return (
     <div>
-      <div className="mb-8">
-        <TagFilter tags={categoryTags} />
-      </div>
+      <FadeIn>
+        <div className="mb-8">
+          <TagFilter tags={categoryTags} />
+        </div>
+      </FadeIn>
       
-      <h2 className="text-2xl font-bold mb-6 pb-2 border-b border-gray-200 dark:border-gray-700">
+      <motion.h2 
+        className="text-2xl font-bold mb-6 pb-2 border-b border-gray-200 dark:border-gray-700"
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5 }}
+      >
         {categoryName} 포스트 {selectedTags.length > 0 ? '(태그 필터링 적용됨)' : ''}
-      </h2>
+      </motion.h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {posts.map(post => (
-          <PostCard key={post.slug} post={post} />
+        {posts.map((post, index) => (
+          <PostCard key={post.slug} post={post} delay={0.1 + index * 0.05} />
         ))}
       </div>
       
       {posts.length === 0 && (
-        <div className="text-center py-16 bg-pastel-blue dark:bg-gray-800 rounded-xl">
-          <p className="text-xl text-gray-600 dark:text-gray-300">
-            {selectedTags.length > 0 
-              ? '선택한 필터에 해당하는 포스트가 없습니다.'
-              : '이 카테고리에 아직 포스트가 없습니다.'}
-          </p>
-        </div>
+        <FadeIn direction="up" delay={0.2}>
+          <div className="text-center py-16 bg-pastel-blue dark:bg-gray-800 rounded-xl">
+            <p className="text-xl text-gray-600 dark:text-gray-300">
+              {selectedTags.length > 0 
+                ? '선택한 필터에 해당하는 포스트가 없습니다.'
+                : '이 카테고리에 아직 포스트가 없습니다.'}
+            </p>
+          </div>
+        </FadeIn>
       )}
     </div>
   );
