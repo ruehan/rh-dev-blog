@@ -2,6 +2,40 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 타이포그래피 스타일 - 목차 링크 관련 */
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
+  position: relative;
+  scroll-margin-top: 100px;
+}
+
+.prose .anchor {
+  visibility: hidden;
+  position: absolute;
+  top: 50%;
+  left: -1.5rem;
+  transform: translateY(-50%);
+  padding-right: 0.5rem;
+  color: theme('colors.primary.500');
+}
+
+.prose *:hover > .anchor {
+  visibility: visible;
+}
+
+.prose .anchor-icon {
+  display: inline-block;
+  transition: all 0.2s;
+}
+
+.prose .anchor:hover .anchor-icon {
+  transform: scale(1.1);
+}
+
 html,
 body {
   @apply bg-white dark:bg-gray-950;

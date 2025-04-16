@@ -3,6 +3,7 @@ import fs from 'fs/promises';
 import { bundleMDX } from 'mdx-bundler';
 import rehypeSlug from 'rehype-slug';
 import rehypeHighlight from 'rehype-highlight';
+import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import remarkGfm from 'remark-gfm';
 
 const rootDirectory = process.cwd();
@@ -38,6 +39,24 @@ export async function getPost(slug: string) {
       options.rehypePlugins = [
         ...(options.rehypePlugins ?? []),
         rehypeSlug,
+        [rehypeAutolinkHeadings, { 
+          properties: {
+            className: ['anchor'],
+            ariaHidden: true,
+            tabIndex: -1
+          },
+          content: {
+            type: 'element',
+            tagName: 'span',
+            properties: {
+              className: ['anchor-icon']
+            },
+            children: [{ 
+              type: 'text', 
+              value: '#' 
+            }]
+          }
+        }],
         rehypeHighlight,
       ];
       return options;
