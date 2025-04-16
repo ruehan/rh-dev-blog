@@ -1,6 +1,6 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Outlet, useLoaderData } from "@remix-run/react";
+import { Outlet, useLoaderData, useLocation, useParams } from "@remix-run/react";
 import { Sidebar } from "~/components/Sidebar";
 import { getAllCategories, getAllTags, getPopularPosts } from "~/lib/mdx.server";
 
@@ -14,13 +14,18 @@ export async function loader({ request }: LoaderFunctionArgs) {
   
   return json({
     categories,
+    allTags,
     popularTags,
     popularPosts
   });
 }
 
 export default function BlogLayout() {
-  const { categories, popularTags, popularPosts } = useLoaderData<typeof loader>();
+  const { categories, allTags, popularTags, popularPosts } = useLoaderData<typeof loader>();
+  const params = useParams();
+  
+  // 현재 카테고리 가져오기 (URL에서 추출)
+  const currentCategory = params.slug;
   
   return (
     <div className="mx-auto max-w-6xl py-12 px-4 lg:px-8">
@@ -32,8 +37,10 @@ export default function BlogLayout() {
         <div className="w-full lg:w-1/3">
           <Sidebar 
             categories={categories}
+            allTags={allTags}
             popularTags={popularTags}
             popularPosts={popularPosts}
+            currentCategory={currentCategory}
           />
         </div>
       </div>

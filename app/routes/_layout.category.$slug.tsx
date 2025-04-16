@@ -1,9 +1,9 @@
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
-import { CategoryFilter } from "~/components/CategoryFilter";
+import { Link, useLoaderData, useSearchParams } from "@remix-run/react";
+import { TagFilter } from "~/components/TagFilter";
 import { PostCard } from "~/components/PostCard";
-import { getAllCategories, getPostsByCategory } from "~/lib/mdx.server";
+import { getAllCategories, getAllTags, getPostsByCategory } from "~/lib/mdx.server";
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   if (!data) {
@@ -19,9 +19,12 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
   ];
 };
 
-export const loader = async ({ params }: LoaderFunctionArgs) => {
+export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const slug = params.slug;
   if (!slug) throw new Response("카테고리를 찾을 수 없습니다", { status: 404 });
+
+  const url = new URL(request.url);
+  const selectedTags = url.searchParams.getAll("tags");
 
   const categories = await getAllCategories();
   const category = categories.find(c => c.slug === slug);
@@ -30,34 +33,56 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     throw new Response("카테고리를 찾을 수 없습니다", { status: 404 });
   }
   
-  const posts = await getPostsByCategory(category.name);
+  let posts = await getPostsByCategory(category.name);
+  
+  // 선택된 태그가 있으면 포스트 필터링
+  if (selectedTags.length > 0) {
+    posts = posts.filter(post => {
+      // 모든 선택된 태그를 포함하는 포스트만 필터링
+      return selectedTags.every(tag => post.tags?.includes(tag));
+    });
+  }
+  
+  // 이 카테고리에 있는 포스트에서 사용된 모든 태그 가져오기
+  const categoryTags = Array.from(
+    new Set(
+      posts.flatMap(post => post.tags || [])
+    )
+  );
+  
+  // 모든 태그 가져오기
+  const allTags = await getAllTags();
   
   return json({
     posts,
     categorySlug: slug,
     categoryName: category.name,
-    categories
+    categories,
+    categoryTags,
+    allTags,
+    selectedTags
   });
 };
 
 export default function CategoryPage() {
-  const { posts, categoryName, categorySlug, categories } = useLoaderData<typeof loader>();
+  const { 
+    posts, 
+    categoryName, 
+    categorySlug, 
+    categories, 
+    categoryTags,
+    selectedTags 
+  } = useLoaderData<typeof loader>();
   
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-4 text-gray-800 dark:text-white">
-          {categoryName}
-        </h1>
-        <p className="text-gray-600 dark:text-gray-300 mb-6">
-          {categoryName} 카테고리의 포스트 ({posts.length}개)
-        </p>
-        
-        <CategoryFilter 
-          categories={categories}
-          currentCategory={categorySlug} 
-        />
+        <TagFilter tags={categoryTags} />
       </div>
+      
+      <h2 className="text-2xl font-bold mb-6 pb-2 border-b border-gray-200 dark:border-gray-700">
+        {categoryName} 포스트 {selectedTags.length > 0 ? '(태그 필터링 적용됨)' : ''}
+      </h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {posts.map(post => (
@@ -68,7 +93,9 @@ export default function CategoryPage() {
       {posts.length === 0 && (
         <div className="text-center py-16 bg-pastel-blue dark:bg-gray-800 rounded-xl">
           <p className="text-xl text-gray-600 dark:text-gray-300">
-            이 카테고리에 아직 포스트가 없습니다.
+            {selectedTags.length > 0 
+              ? '선택한 필터에 해당하는 포스트가 없습니다.'
+              : '이 카테고리에 아직 포스트가 없습니다.'}
           </p>
         </div>
       )}

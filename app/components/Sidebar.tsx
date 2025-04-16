@@ -1,6 +1,7 @@
 import { Link } from "@remix-run/react";
 import { CategoryFilter } from "./CategoryFilter";
 import { TagList } from "./TagList";
+import { TagFilter } from "./TagFilter";
 import { SearchBox } from "./SearchBox";
 
 // 임시 인기 포스트 타입
@@ -13,9 +14,11 @@ interface PopularPost {
 interface SidebarProps {
   categories: { name: string; slug: string; count?: number }[];
   popularTags?: string[];
+  allTags?: string[];
   popularPosts?: PopularPost[];
   currentCategory?: string;
   showCategories?: boolean;
+  showTagFilter?: boolean;
   showPopularTags?: boolean;
   showPopularPosts?: boolean;
   showSearch?: boolean;
@@ -25,9 +28,11 @@ interface SidebarProps {
 export function Sidebar({
   categories,
   popularTags = [],
+  allTags = [],
   popularPosts = [],
   currentCategory,
   showCategories = true,
+  showTagFilter = true,
   showPopularTags = true,
   showPopularPosts = true,
   showSearch = true,
@@ -47,6 +52,12 @@ export function Sidebar({
             categories={categories} 
             currentCategory={currentCategory} 
           />
+        </div>
+      )}
+
+      {showTagFilter && allTags.length > 0 && (
+        <div>
+          <TagFilter tags={allTags} />
         </div>
       )}
       
@@ -81,27 +92,6 @@ export function Sidebar({
           </div>
         </div>
       )}
-      
-      <div className="bg-pastel-blue dark:bg-gray-700 rounded-lg p-5 text-gray-800 dark:text-white">
-        <h3 className="font-semibold mb-2">뉴스레터 구독</h3>
-        <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
-          최신 블로그 포스트와 업데이트를 받아보세요.
-        </p>
-        <form className="space-y-2">
-          <input
-            type="email"
-            placeholder="이메일 주소"
-            className="w-full px-3 py-2 text-sm rounded-md border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-white"
-            required
-          />
-          <button
-            type="submit"
-            className="w-full px-3 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-md text-sm font-medium transition-colors"
-          >
-            구독하기
-          </button>
-        </form>
-      </div>
     </aside>
   );
 } 
